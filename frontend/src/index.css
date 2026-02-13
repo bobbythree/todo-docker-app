@@ -24,3 +24,7 @@ body {
 input {
   width: 150px;
 }
+
+#todo-list {
+  color: pink;
+}
