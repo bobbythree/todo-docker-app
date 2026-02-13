@@ -1,48 +1,72 @@
 import { useState, useEffect } from "react";
-import { getTodos, createTodo } from "./api/todos";
 
 export default function App() {
   const [inputValue, setInputValue] = useState("");
   const [todos, setTodos] = useState([]);
 
+  const fetchTodos = async () => {
+    const res = await fetch("/api/todos");
+    if (!res.ok) return;
+    const data = await res.json();
+    setTodos(data);
+  };
+
   useEffect(() => {
     const loadTodos = async () => {
-      const data = await getTodos();
-      setTodos(data);
+      await fetchTodos();
     };
 
     loadTodos();
   }, []);
 
+  const handleChange = (e) => {
+    setInputValue(e.target.value);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+
     if (!inputValue.trim()) return;
 
-    await createTodo(inputValue);
-    setInputValue("");
+    await fetch("/api/todos", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: inputValue }),
+    });
 
-    const updated = await getTodos();
-    setTodos(updated);
+    setInputValue("");
+    await fetchTodos();
   };
 
   return (
     <>
       <div id="heading">Yet another Todo app!!</div>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={inputValue}
-          onChange={(e) => setInputValue(e.target.value)}
-        />
-        <button type="submit">Add</button>
-      </form>
+      <div id="input-container">
+        <form onSubmit={handleSubmit}>
+          <label>Add todo</label>
 
-      <ul>
-        {todos.map((todo) => (
-          <li key={todo.id}>{todo.title}</li>
-        ))}
-      </ul>
+          <input
+            type="text"
+            value={inputValue}
+            onChange={handleChange}
+          />
+
+          <button type="submit">add</button>
+        </form>
+      </div>
+
+      <div id="todo-list">
+        <ul>
+          {todos.map((todo) => (
+            <li key={todo.id}>
+              {todo.title}
+            </li>
+          ))}
+        </ul>
+      </div>
     </>
   );
 }
