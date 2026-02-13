@@ -1,0 +1,26 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: #181818;
+}
+
+#heading {
+  padding: 3rem 0 0 3rem;
+  color: antiquewhite;
+  font-size: 33px;
+}
+
+#input-container {
+  display: flex;
+  flex-direction: column;
+  color: antiquewhite;
+  padding: 3rem;
+}
+
+input {
+  width: 150px;
+}
