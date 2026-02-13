@@ -1,44 +1,49 @@
-import { useState } from "react"
+import { useState, useEffect } from "react";
+import { getTodos, createTodo } from "./api/todos";
 
 export default function App() {
   const [inputValue, setInputValue] = useState("");
+  const [todos, setTodos] = useState([]);
 
-  const handleChange = (e) => {
-    setInputValue(e.target.value);
-  }
+  useEffect(() => {
+    const loadTodos = async () => {
+      const data = await getTodos();
+      setTodos(data);
+    };
+
+    loadTodos();
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
     if (!inputValue.trim()) return;
 
-    await fetch('/api/todos', {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({ title: inputValue }),
-    });
+    await createTodo(inputValue);
     setInputValue("");
-  }
+
+    const updated = await getTodos();
+    setTodos(updated);
+  };
 
   return (
     <>
       <div id="heading">Yet another Todo app!!</div>
-      <div id="input-container">
-        <form onSubmit={handleSubmit}>
-          <label>
-            Add todo
-          </label>
-          <input
-            type="text"
-            value={inputValue}
-            onChange={handleChange}
-          />
-          <button type="submit">add</button>
-        </form>
-      </div >
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          value={inputValue}
+          onChange={(e) => setInputValue(e.target.value)}
+        />
+        <button type="submit">Add</button>
+      </form>
+
+      <ul>
+        {todos.map((todo) => (
+          <li key={todo.id}>{todo.title}</li>
+        ))}
+      </ul>
     </>
-  )
+  );
 }
 
